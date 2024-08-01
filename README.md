@@ -55,11 +55,3 @@ C++练手项目，用于Linux环境下的Socket接收与发送
    due to a missing content-type header. Updated the upload logic to ensure
    proper MIME type handling.
    ```
-
-## 其他说明
-
-- **主题（subject）** 应为一句话的形式，并以小写字母开头，不以句号结尾。
-- **描述（description）** 应尽量详细地解释变更的内容和原因，尤其是对于复杂的改动或修复，描述有助于团队成员和未来的维护者理解这次提交的意义。
-- 在提交前，请确保代码通过了必要的测试，并符合项目的代码风格规范。
-
-遵循这一规范，可以帮助团队保持清晰的提交历史，提升协作效率。
