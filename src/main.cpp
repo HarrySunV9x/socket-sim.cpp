@@ -1,23 +1,16 @@
 #include "spdlog/spdlog.h"
 #include "include/validate_arg.h"
 
-enum ArgErrors {
-    kOK = 0,
-    kErrorNeedArg,
-};
-
-int ValidateArg(int argc, char *argv[]) {
-    if (argc == 1) {
-        spdlog::error("socket_sim need args.");
-        return 1;
-    }
-
-    return 0;
-}
-
 int main(int argc, char *argv[]) {
     spdlog::info("Welcome to spdlog!");
 
-    ValidateArg(argc, argv);
+    ValidateArg &validateArg = ValidateArg::getInstance();
+
+    ValidateArg::ArgErrors res = validateArg.CheckArgs(argc, argv);
+    if (res == ValidateArg::kOK) {
+        spdlog::info("{0}", validateArg.ErrorsInfo[res]);
+    } else {
+        spdlog::error("{0}", validateArg.ErrorsInfo[res]);
+    }
     return 0;
 }
