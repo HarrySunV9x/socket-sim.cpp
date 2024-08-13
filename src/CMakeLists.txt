@@ -1,4 +1,9 @@
 # 设置源文件列表
-set(SRC_FILES main.cpp validate_arg.cpp)
+set(SRC_FILES main.cpp
+        validate_arg.cpp)
 
+# 创建静态库
+add_library(socket_test_lib STATIC validate_arg.cpp)
+
+# 创建可执行文件
 add_executable(socket ${SRC_FILES})

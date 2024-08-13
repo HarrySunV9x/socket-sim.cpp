@@ -11,12 +11,14 @@ class ValidateArg {
 public:
     enum ArgErrors {
         kOK = 0,
-        kErrorNeedArg,
+        kNeedArg,
+        kUnknownParameter
     };
 
     std::map<ArgErrors, std::string> ErrorsInfo = {
             {kOK, "参数校验成功"},
-            {kErrorNeedArg, "程序需要传入参数"}
+            {kNeedArg, "程序需要传入参数"},
+            {kUnknownParameter, "未知参数"}
     };
 
     // 实现单例：公有静态引用
