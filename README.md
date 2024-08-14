@@ -36,22 +36,12 @@ C++练手项目，用于Linux环境下的Socket接收与发送
 
 - **`<subject>`**: 简要描述此次更改的内容。应简洁明了，通常控制在50个字符以内。
 
-- **`<description>`**: 可选的详细描述，用于解释更改的动机和背景。描述部分应放在第一行空行之后，可以包含多行内容。
+- **`<description>`**: 可选的详细描述，用于解释更改的动机和背景。描述部分应放在第一行空行之后，可以包含多行内容。每行前使用 - 符号代表新的内容。
 
 ## 提交信息示例
-
-1. **简单提交信息（无详细描述）**
-
-   ```
-   feat: Add image upload functionality
-   ```
-
-2. **复杂提交信息（带详细描述）**
-
-   ```
-   fix: Correct image upload error
-   
-   Fixed an issue where images were not being correctly uploaded to the server
-   due to a missing content-type header. Updated the upload logic to ensure
-   proper MIME type handling.
-   ```
+```
+ feat: 增加参数校验测试用例
+ - 修改CMakeList，实现关联
+ - 增加参数校验测试用例
+ - 简单修正了参数校验程序
+```
