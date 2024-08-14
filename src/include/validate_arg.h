@@ -6,6 +6,7 @@
 #define SOCKET_SIM_CPP_VALIDATE_ARG_H
 #include <map>
 #include <string>
+#include "getopt.h"
 
 class ValidateArg {
 public:
@@ -13,12 +14,6 @@ public:
         kOK = 0,
         kNeedArg,
         kUnknownParameter
-    };
-
-    std::map<ArgErrors, std::string> ErrorsInfo = {
-            {kOK, "参数校验成功"},
-            {kNeedArg, "程序需要传入参数"},
-            {kUnknownParameter, "未知参数"}
     };
 
     // 实现单例：公有静态引用
@@ -34,10 +29,14 @@ public:
     ValidateArg& operator=(const ValidateArg&) = delete;
 
     ArgErrors CheckArgs(int argc, char *argv[]);
+    void GetHelp();
+
+    std::map<ArgErrors, std::string> ErrorsInfo;
 
 private:
+    struct option *long_opts;
     // 实现单例：私有构造函数与析构函数
-    ValidateArg(){};
+    ValidateArg();
     ~ValidateArg()= default;
 
 };
