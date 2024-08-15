@@ -1,7 +1,10 @@
 # 设置源文件列表
 set(SRC_FILES main.cpp
         validate_arg.cpp
-        logger.cpp)
+        logger.cpp
+        socket_base.cpp
+        socket_server.cpp
+)
 
 # 创建静态库
 add_library(socket_test_lib STATIC validate_arg.cpp)

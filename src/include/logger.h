@@ -6,6 +6,7 @@
 #define SOCKET_SIM_CPP_LOGGER_H
 
 #include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/spdlog.h"
 
 extern std::shared_ptr<spdlog::logger> fLogger;
 

@@ -5,6 +5,7 @@
 #include <iostream>
 #include "include/validate_arg.h"
 #include "include/logger.h"
+#include "include/socket_server.h"
 
 ValidateArg::ValidateArg() {
     long_opts = new struct option[]{
