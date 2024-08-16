@@ -9,8 +9,6 @@
 #include <arpa/inet.h>                      // inet_addr
 #include "include/logger.h"
 
-#define MAX_TRY_PORT 5
-
 SocketServer::SocketServer() = default;
 
 void SocketServer::Close() {
@@ -37,6 +35,7 @@ int SocketServer::Init() {
 
         if (bind(serverFd, (struct sockaddr *)&socket_addr, sizeof(socket_addr)) == 0) {
             spdlog::info("绑定成功");
+            listenPort = port;
             return 0;
         }
     }
@@ -57,13 +56,18 @@ int SocketServer::Init(std::string address, std::string port) {
 
 int SocketServer::ProcessData(int processFd) {
     char recvBuff[1024];
-    int readLen = recv(processFd, recvBuff, 1024, 0);
-    if(readLen < 0) {
-        printf("Recv Socket Failed. err: %s", strerror(errno));		// 错误打印
-        close(processFd);							// 接收失败关闭Socket
-        return -1;  // 异常退出
+    int readLen = recv(processFd, recvBuff, sizeof(recvBuff) - 1, 0);
+    if (readLen <= 0) {
+        if (readLen == 0) {
+            spdlog::error("连接关闭. FD: {0}", processFd);
+        } else {
+            spdlog::error("接收数据失败. FD: {0}, 原因：{1}", processFd, strerror(errno));
+        }
+        close(processFd);
+        return -1;
     }
 
+    recvBuff[readLen] = '\0';
     std::string recvStr = recvBuff;
     // 数据处理逻辑，此处为打印
     spdlog::info("收到数据： {0}", recvStr.c_str());
@@ -81,19 +85,20 @@ int SocketServer::EstablishConnection() {
         Close();
         return -1;
     }
-    int accept_socket = accept(GetSocketFd(), nullptr, nullptr);
-
-    if (accept_socket < 0) {
-        spdlog::error("接收失败： " + std::string(strerror(errno)));
-        Close();
-        return -1;
-    }
+    spdlog::info("监听成功，地址: {0}, 端口: {1}", GetAddress(), listenPort);
 
     while(true) {
-        if (ProcessData(accept_socket) < 0) {
-            return -1;
-        } else if (ProcessData(accept_socket) == 0) {
-            return 0;
+        int accept_socket = accept(GetSocketFd(), nullptr, nullptr);
+        if (accept_socket < 0) {
+            spdlog::error("建立socket连接失败： " + std::string(strerror(errno)));
+            continue;
+        }
+        spdlog::info("建立新的连接，Fd: {0}, 端口: {1}", accept_socket, listenPort);
+
+        while (true) {
+            if (ProcessData(accept_socket) < 0) {
+                break;
+            }
         }
     }
 }

@@ -6,6 +6,8 @@
 #include "include/validate_arg.h"
 #include "include/logger.h"
 #include "include/socket_server.h"
+#include "include/socket_handler.h"
+#include "include/socket_client.h"
 
 ValidateArg::ValidateArg() {
     long_opts = new struct option[]{
@@ -39,8 +41,10 @@ ValidateArg::ArgErrors ValidateArg::CheckArgs(int argc, char *argv[]) {
             std::cout << APP_VERSION << std::endl;
             break;
         case 's':
+            SocketHandler::getInstance().m_socket = std::make_unique<SocketServer>();
             break;
         case 'c':
+            SocketHandler::getInstance().m_socket = std::make_unique<SocketClient>();
             break;
         case 't':
             break;

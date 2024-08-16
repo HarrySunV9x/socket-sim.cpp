@@ -7,6 +7,7 @@
 
 #define DEFAULT_ADDRESS     "127.0.0.1"
 #define DEFAULT_PORT        "21120"
+#define MAX_TRY_PORT 5
 
 #include <string>
 
@@ -82,7 +83,7 @@ public:
     virtual void Close() = 0;
 
     SocketBase();
-    ~SocketBase() = default;
+    virtual ~SocketBase() = default;
 
 private:
     int s_fd = -1;

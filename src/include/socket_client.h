@@ -1,15 +1,15 @@
 //
-// Created by WorkHarry on 2024/8/15.
+// Created by WorkHarry on 2024/8/16.
 //
 
-#ifndef SOCKET_SIM_CPP_SOCKET_SERVER_H
-#define SOCKET_SIM_CPP_SOCKET_SERVER_H
+#ifndef SOCKET_SIM_CPP_SOCKET_CLIENT_H
+#define SOCKET_SIM_CPP_SOCKET_CLIENT_H
 #include "socket_base.h"
 
-class SocketServer: public SocketBase {
+class SocketClient: public SocketBase{
 public:
-    SocketServer();
-    ~SocketServer() override = default;
+    SocketClient();
+    ~SocketClient() override = default;
 
     int Init() override;
     int Init(std::string address) override;
@@ -17,8 +17,7 @@ public:
     int EstablishConnection() override;
     int ProcessData(int processFd) override;
     void Close() override;
-
-    int listenPort = -1;
 };
 
-#endif //SOCKET_SIM_CPP_SOCKET_SERVER_H
+
+#endif //SOCKET_SIM_CPP_SOCKET_CLIENT_H

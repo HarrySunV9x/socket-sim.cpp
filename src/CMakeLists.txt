@@ -4,6 +4,8 @@ set(SRC_FILES main.cpp
         logger.cpp
         socket_base.cpp
         socket_server.cpp
+        socket_handler.cpp
+        socket_client.cpp
 )
 
 # 创建静态库
