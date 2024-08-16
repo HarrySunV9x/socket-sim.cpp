@@ -54,6 +54,11 @@ int SocketServer::Init(std::string address, std::string port) {
     return Init();
 }
 
+int SocketServer::Init(std::string address, std::string port, std::string message) {
+    spdlog::error("错误调用，Server 不接受Message");
+    return -1;
+}
+
 int SocketServer::ProcessData(int processFd) {
     char recvBuff[1024];
     spdlog::info("Server 正在等待接收数据...", listenPort);

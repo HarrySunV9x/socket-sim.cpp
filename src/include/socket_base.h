@@ -49,6 +49,7 @@ public:
     virtual int Init() = 0;
     virtual int Init(std::string address) = 0;
     virtual int Init(std::string address, std::string port) = 0;
+    virtual int Init(std::string address, std::string port, std::string message) = 0;
 
     /**
      * @brief 用于建立通信

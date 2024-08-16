@@ -35,4 +35,3 @@ void SocketBase::SetPort(const std::string &port) {
     SocketBase::s_port = port;
 }
 
-

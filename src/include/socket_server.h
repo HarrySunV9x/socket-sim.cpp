@@ -14,6 +14,7 @@ public:
     int Init() override;
     int Init(std::string address) override;
     int Init(std::string address, std::string port) override;
+    int Init(std::string address, std::string port, std::string message) override;
     int EstablishConnection() override;
     int ProcessData(int processFd) override;
     void Close() override;

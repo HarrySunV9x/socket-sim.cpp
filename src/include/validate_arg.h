@@ -13,7 +13,11 @@ public:
     enum ArgErrors {
         kOK = 0,
         kNeedArg,
-        kUnknownParameter
+        kUnknownParameter,
+        kInitFailed,
+        kAddressError,
+        kPortError,
+        kMessageError,
     };
 
     // 实现单例：公有静态引用

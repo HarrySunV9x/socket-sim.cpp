@@ -15,10 +15,10 @@ int main(int argc, char *argv[]) {
 
     fLogger->info("参数校验成功");
 
-    if (SocketHandler::getInstance().m_socket == nullptr ||
-    SocketHandler::getInstance().m_socket->Init() != 0) {
+    if (SocketHandler::getInstance().m_socket == nullptr) {
         return 1;
     }
+
     if (SocketHandler::getInstance().m_socket->EstablishConnection() != 0) {
         SocketHandler::getInstance().m_socket->Close();
         return 1;

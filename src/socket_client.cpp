@@ -41,7 +41,27 @@ int SocketClient::Init(std::string address, std::string port) {
     return Init();
 }
 
+int SocketClient::Init(std::string address, std::string port, std::string message) {
+    SetAddress(address);
+    SetPort(port);
+    m_message = message;
+    return Init();
+}
+
 int SocketClient::ProcessData(int processFd) {
+    if (!m_message.empty()) {
+
+        ssize_t sentLen = send(processFd, m_message.c_str(), m_message.size(), 0);
+        if (sentLen != static_cast<ssize_t>(m_message.size())) {
+            spdlog::error("数据发送失败. FD: {0}, 原因：{1}, 数据：{2}",
+                          processFd, strerror(errno), m_message);
+            Close();  // 确保连接关闭
+            return -1;
+        }
+        spdlog::info("数据发送成功. FD: {0}, 数据：{1}",processFd, m_message);
+
+        return 0;
+    }
     while (true) {
         std::string message;
         std::cout << "请输入消息: ";
