@@ -56,6 +56,7 @@ int SocketServer::Init(std::string address, std::string port) {
 
 int SocketServer::ProcessData(int processFd) {
     char recvBuff[1024];
+    spdlog::info("Server 正在等待接收数据...", listenPort);
     int readLen = recv(processFd, recvBuff, sizeof(recvBuff) - 1, 0);
     if (readLen <= 0) {
         if (readLen == 0) {
@@ -88,6 +89,7 @@ int SocketServer::EstablishConnection() {
     spdlog::info("监听成功，地址: {0}, 端口: {1}", GetAddress(), listenPort);
 
     while(true) {
+        spdlog::info("Server 正在等待新的连接...", listenPort);
         int accept_socket = accept(GetSocketFd(), nullptr, nullptr);
         if (accept_socket < 0) {
             spdlog::error("建立socket连接失败： " + std::string(strerror(errno)));
