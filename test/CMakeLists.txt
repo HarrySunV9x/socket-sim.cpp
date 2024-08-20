@@ -1,6 +1,6 @@
 add_executable(hello_test
         validate_arg_test.cpp
-        socket_client_test.cpp)
+        socket_test.cpp)
 
 target_link_libraries(hello_test
         ${PROJECT_SOURCE_DIR}/lib/libgtest.a
