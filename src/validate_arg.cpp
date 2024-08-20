@@ -42,46 +42,57 @@ ValidateArg::ArgErrors ValidateArg::CheckArgs(int argc, char *argv[]) {
         return kNeedArg;
     }
 
-    const auto opt = getopt_long(argc, argv, "hvsct:", long_opts, nullptr);
-
-    switch (opt) {
-        case 'h':
-            GetHelp();
-            break;
-        case 'v':
-            std::cout << APP_VERSION << std::endl;
-            break;
-        case 's':
-            SocketHandler::getInstance().m_socket = std::make_unique<SocketServer>();
-            SocketHandler::getInstance().m_socket->SetSocketType(SocketBase::kServer);
-            break;
-        case 'c':
-            SocketHandler::getInstance().m_socket = std::make_unique<SocketClient>();
-            SocketHandler::getInstance().m_socket->SetSocketType(SocketBase::kClient);
-            break;
-        case 'a':
-            if (SocketHandler::getInstance().m_socket->GetSocketType() == SocketBase::kNone) {
-                return kAddressError;
-            }
-            address = optarg;
-            break;
-        case 'p':
-            if (SocketHandler::getInstance().m_socket->GetSocketType() == SocketBase::kNone) {
-                return kPortError;
-            }
-            port = optarg;
-            break;
-        case 'm':
-            if (SocketHandler::getInstance().m_socket->GetSocketType() != SocketBase::kClient) {
-                return kMessageError;
-            }
-            message = optarg;
-            break;
-        case 't':
-            break;
-        default:
-            return kUnknownParameter;
+    int opt;
+    while ((opt = getopt_long(argc, argv, "hvsct:a:p:m:", long_opts, nullptr)) != -1) {
+        switch (opt) {
+            case 'h':
+                GetHelp();
+                return kOK;
+            case 'v':
+                std::cout << APP_VERSION << std::endl;
+                return kOK;
+            case 's':
+                if (SocketHandler::getInstance().m_socket) {
+                    return kUnknownParameter;
+                }
+                SocketHandler::getInstance().m_socket = std::make_unique<SocketServer>();
+                SocketHandler::getInstance().m_socket->SetSocketType(SocketBase::kServer);
+                break;
+            case 'c':
+                if (SocketHandler::getInstance().m_socket) {
+                    return kUnknownParameter;
+                }
+                SocketHandler::getInstance().m_socket = std::make_unique<SocketClient>();
+                SocketHandler::getInstance().m_socket->SetSocketType(SocketBase::kClient);
+                break;
+            case 'a':
+                if (!SocketHandler::getInstance().m_socket ||
+                    SocketHandler::getInstance().m_socket->GetSocketType() == SocketBase::kNone) {
+                    return kAddressError;
+                }
+                address = optarg;
+                break;
+            case 'p':
+                if (!SocketHandler::getInstance().m_socket ||
+                    SocketHandler::getInstance().m_socket->GetSocketType() == SocketBase::kNone) {
+                    return kPortError;
+                }
+                port = optarg;
+                break;
+            case 'm':
+                if (!SocketHandler::getInstance().m_socket ||
+                    SocketHandler::getInstance().m_socket->GetSocketType() != SocketBase::kClient) {
+                    return kMessageError;
+                }
+                message = optarg;
+                break;
+            case 't':
+                break;
+            default:
+                return kUnknownParameter;
+        }
     }
+
     fLogger->info("参数校验完成");
 
     if (!address.empty() && !port.empty() && !message.empty()) {
@@ -98,7 +109,6 @@ ValidateArg::ArgErrors ValidateArg::CheckArgs(int argc, char *argv[]) {
 
     return kOK;
 }
-
 void ValidateArg::GetHelp() {
     std::cout << "Usage: socket [options]\n"
               << "Options: \n"

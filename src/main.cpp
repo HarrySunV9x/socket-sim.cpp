@@ -9,7 +9,9 @@ int main(int argc, char *argv[]) {
 
     if (res != ValidateArg::kOK) {
         std::string errorStr = validateArg.ErrorsInfo[res];
+        spdlog::error(errorStr);
         fLogger->error(errorStr);
+        validateArg.GetHelp();
         return 1;
     }
 
