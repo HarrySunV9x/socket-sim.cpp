@@ -80,7 +80,7 @@ int SocketClient::ProcessData(int processFd) {
             continue;  // 跳过空输入
         }
 
-        std::string sendBuffer = "I want tell you: " + message;
+        std::string sendBuffer = message;
 
         ssize_t sentLen = send(processFd, sendBuffer.c_str(), sendBuffer.size(), 0);
         if (sentLen != static_cast<ssize_t>(sendBuffer.size())) {
@@ -90,6 +90,25 @@ int SocketClient::ProcessData(int processFd) {
             return -1;
         }
         spdlog::info("数据发送成功. FD: {0}, 数据：{1}", processFd, sendBuffer);
+        char recvBuff[1024];
+        spdlog::info("Client 正在等待接收数据...");
+        int readLen = recv(processFd, recvBuff, sizeof(recvBuff) - 1, 0);
+        if (readLen <= 0) {
+            if (readLen == 0) {
+                spdlog::error("连接关闭. FD: {0}", processFd);
+            } else {
+                spdlog::error("接收数据失败. FD: {0}, 原因：{1}", processFd, strerror(errno));
+            }
+            close(processFd);
+            return -1;
+        } else {
+            recvBuff[readLen] = '\0';
+            std::string recvStr = recvBuff;
+            // 数据处理逻辑，此处为打印
+            spdlog::info("收到数据： {0}", recvStr.c_str());
+        }
+        
+
     }
 
     return 0;  // 继续收发

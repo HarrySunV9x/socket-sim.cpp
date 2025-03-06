@@ -92,6 +92,15 @@ int SocketServer::ProcessData(int processFd) {
     // 数据处理逻辑，此处为打印
     spdlog::info("收到数据： {0}", recvStr.c_str());
 
+    std::string sendBuffer = "message received: " + recvStr;
+    size_t sentLen = send(processFd, sendBuffer.c_str(), sendBuffer.size(), 0);
+    if (sentLen != sendBuffer.size()) {
+        spdlog::error("数据发送失败. FD: {0}, 原因：{1}, 数据：{2}",
+                      processFd, strerror(errno), sendBuffer);
+        close(processFd);  // 确保连接关闭
+        return -1;
+    }
+
     if (recvStr == "stop") {
         return 0;  // 正常退出
     }
