@@ -3,10 +3,14 @@
 //
 
 #include "include/socket_server.h"
-#include <sys/socket.h>					    // 引入socket数据类型与方法，如struct sockaddr、socket()、bind()等
-#include <unistd.h>							// 与操作系统交互的方法，如close()
-#include <netinet/in.h>					    // 包含了用于IP地址和端口号等数据结构，如IPPROTO_IP
-#include <arpa/inet.h>                      // inet_addr
+#ifdef PLATFORM_WINDOWS
+#include <winsock2.h>  // windows的socket头文件
+#else
+#include <arpa/inet.h>   // inet_addr
+#include <netinet/in.h>  // 包含了用于IP地址和端口号等数据结构，如IPPROTO_IP
+#include <sys/socket.h>  // 引入socket数据类型与方法，如struct sockaddr、socket()、bind()等
+#include <unistd.h>      // 与操作系统交互的方法，如close()
+#endif
 #include "include/logger.h"
 
 SocketServer::SocketServer() = default;
@@ -16,6 +20,16 @@ void SocketServer::Close() {
 }
 
 int SocketServer::Init() {
+#ifdef PLATFORM_WINDOWS
+    /* 初始化WindowsAPI */
+    WSADATA wsaData;
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+        spdlog::error("WSA Start Up Error");
+        return -1;
+    }
+    spdlog::info("WSA Start Up");
+#endif
+
     int serverFd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
     if (serverFd < 0) {
         spdlog::error("socket创建失败： " + std::string(strerror(errno)));
@@ -24,14 +38,14 @@ int SocketServer::Init() {
     SetSocketFd(serverFd);
 
     struct sockaddr_in socket_addr = {0};
-    memset(&socket_addr, 0, sizeof(socket_addr));		            // 初始化socket_addr为0
-    socket_addr.sin_family = AF_INET;                                       // 协议
-    socket_addr.sin_addr.s_addr = inet_addr(GetAddress().c_str());	    // 域名
+    memset(&socket_addr, 0, sizeof(socket_addr));                   // 初始化socket_addr为0
+    socket_addr.sin_family = AF_INET;                               // 协议
+    socket_addr.sin_addr.s_addr = inet_addr(GetAddress().c_str());  // 域名
 
     for (int i = 0; i < MAX_TRY_PORT; i++) {
         int port = std::stoi(GetPort()) + i;
-        socket_addr.sin_port = htons(port);	// 端口
-        spdlog::info("正在尝试绑定: " + GetAddress() + std::to_string(port));      // 错误打印
+        socket_addr.sin_port = htons(port);                                    // 端口
+        spdlog::info("正在尝试绑定: " + GetAddress() + std::to_string(port));  // 错误打印
 
         if (bind(serverFd, (struct sockaddr *)&socket_addr, sizeof(socket_addr)) == 0) {
             spdlog::info("绑定成功");
@@ -50,7 +64,7 @@ int SocketServer::Init(std::string address) {
 }
 int SocketServer::Init(std::string address, std::string port) {
     SetAddress(address);
-    SetPort(port);
+    SetSocketPort(port);
     return Init();
 }
 
@@ -79,9 +93,9 @@ int SocketServer::ProcessData(int processFd) {
     spdlog::info("收到数据： {0}", recvStr.c_str());
 
     if (recvStr == "stop") {
-        return 0;   // 正常退出
+        return 0;  // 正常退出
     }
-    return 1;   // 继续收发
+    return 1;  // 继续收发
 }
 
 int SocketServer::EstablishConnection() {
@@ -93,7 +107,7 @@ int SocketServer::EstablishConnection() {
     }
     spdlog::info("监听成功，地址: {0}, 端口: {1}", GetAddress(), listenPort);
 
-    while(true) {
+    while (true) {
         spdlog::info("Server 正在等待新的连接...", listenPort);
         int accept_socket = accept(GetSocketFd(), nullptr, nullptr);
         if (accept_socket < 0) {
@@ -109,5 +123,3 @@ int SocketServer::EstablishConnection() {
         }
     }
 }
-
-

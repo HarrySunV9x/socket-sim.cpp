@@ -19,3 +19,7 @@ add_library(socket_test_lib STATIC
 
 # 创建可执行文件
 add_executable(${APP_NAME} ${SRC_FILES})
+
+if(WIN32)
+target_link_libraries(${APP_NAME} wsock32)
+endif()

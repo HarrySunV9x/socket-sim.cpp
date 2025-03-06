@@ -5,6 +5,7 @@
 #ifndef SOCKET_SIM_CPP_SOCKET_SERVER_H
 #define SOCKET_SIM_CPP_SOCKET_SERVER_H
 #include "socket_base.h"
+#include <string>
 
 class SocketServer: public SocketBase {
 public:

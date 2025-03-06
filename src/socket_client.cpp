@@ -3,26 +3,37 @@
 //
 
 #include "include/socket_client.h"
-#include <sys/socket.h>					    // 引入socket数据类型与方法，如struct sockaddr、socket()、bind()等
-#include <unistd.h>							// 与操作系统交互的方法，如close()
-#include <netinet/in.h>					    // 包含了用于IP地址和端口号等数据结构，如IPPROTO_IP
-#include <arpa/inet.h>                      // inet_addr
+#ifdef PLATFORM_WINDOWS
+#include <winsock2.h>  // windows的socket头文件
+#else
+#include <arpa/inet.h>   // inet_addr
+#include <netinet/in.h>  // 包含了用于IP地址和端口号等数据结构，如IPPROTO_IP
+#include <sys/socket.h>  // 引入socket数据类型与方法，如struct sockaddr、socket()、bind()等
+#include <unistd.h>      // 与操作系统交互的方法，如close()
+#endif
 #include "include/logger.h"
-
-#include <string>
 #include <iostream>
 
 SocketClient::SocketClient() = default;
-
 
 void SocketClient::Close() {
     close(GetSocketFd());
 }
 
 int SocketClient::Init() {
+#ifdef PLATFORM_WINDOWS
+    /* 初始化WindowsAPI */
+    WSADATA wsaData;
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+        spdlog::error("WSA Start Up Error");
+        return -1;
+    }
+    spdlog::info("WSA Start Up");
+#endif
+
     int serverFd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
     if (serverFd < 0) {
-        spdlog::error("socket创建失败： " + std::string(strerror(errno)));
+        spdlog::error("socket创建失败");
         return -1;
     }
     SetSocketFd(serverFd);
@@ -37,20 +48,19 @@ int SocketClient::Init(std::string address) {
 }
 int SocketClient::Init(std::string address, std::string port) {
     SetAddress(address);
-    SetPort(port);
+    SetSocketPort(port);
     return Init();
 }
 
 int SocketClient::Init(std::string address, std::string port, std::string message) {
     SetAddress(address);
-    SetPort(port);
+    SetSocketPort(port);
     m_message = message;
     return Init();
 }
 
 int SocketClient::ProcessData(int processFd) {
     if (!m_message.empty()) {
-
         ssize_t sentLen = send(processFd, m_message.c_str(), m_message.size(), 0);
         if (sentLen != static_cast<ssize_t>(m_message.size())) {
             spdlog::error("数据发送失败. FD: {0}, 原因：{1}, 数据：{2}",
@@ -58,7 +68,7 @@ int SocketClient::ProcessData(int processFd) {
             Close();  // 确保连接关闭
             return -1;
         }
-        spdlog::info("数据发送成功. FD: {0}, 数据：{1}",processFd, m_message);
+        spdlog::info("数据发送成功. FD: {0}, 数据：{1}", processFd, m_message);
 
         return 0;
     }
@@ -79,22 +89,22 @@ int SocketClient::ProcessData(int processFd) {
             Close();  // 确保连接关闭
             return -1;
         }
-        spdlog::info("数据发送成功. FD: {0}, 数据：{1}",processFd, sendBuffer);
+        spdlog::info("数据发送成功. FD: {0}, 数据：{1}", processFd, sendBuffer);
     }
 
-    return 0;   // 继续收发
+    return 0;  // 继续收发
 }
 
 int SocketClient::EstablishConnection() {
     struct sockaddr_in socket_addr = {0};
-    memset(&socket_addr, 0, sizeof(socket_addr));		            // 初始化socket_addr为0
-    socket_addr.sin_family = AF_INET;                                       // 协议
-    socket_addr.sin_addr.s_addr = inet_addr(GetAddress().c_str());	    // 域名
+    memset(&socket_addr, 0, sizeof(socket_addr));                   // 初始化socket_addr为0
+    socket_addr.sin_family = AF_INET;                               // 协议
+    socket_addr.sin_addr.s_addr = inet_addr(GetAddress().c_str());  // 域名
 
     for (int i = 0; i < MAX_TRY_PORT; i++) {
         int port = std::stoi(GetPort()) + i;
         socket_addr.sin_port = htons(port);
-        if (connect(GetSocketFd(), (struct sockaddr *) &socket_addr, sizeof(socket_addr)) == 0) {
+        if (connect(GetSocketFd(), (struct sockaddr *)&socket_addr, sizeof(socket_addr)) == 0) {
             spdlog::info("连接成功, Fd: {0}, address: {1}, port: {2}", GetSocketFd(), GetAddress(), port);
             break;
         } else {

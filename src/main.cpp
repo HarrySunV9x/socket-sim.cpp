@@ -1,8 +1,17 @@
-#include "include/validate_arg.h"
 #include "include/logger.h"
 #include "include/socket_handler.h"
+#include "include/validate_arg.h"
+#ifdef PLATFORM_WINDOWS
+#include <windows.h>  // windows的socket头文件
+#endif
 
 int main(int argc, char *argv[]) {
+#ifdef PLATFORM_WINDOWS
+    // 设置控制台输入输出编码为 UTF-8
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
+
     fLogger->info("程序开始");
     ValidateArg &validateArg = ValidateArg::getInstance();
     ValidateArg::ArgErrors res = validateArg.CheckArgs(argc, argv);

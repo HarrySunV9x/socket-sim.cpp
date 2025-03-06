@@ -31,7 +31,7 @@ void SocketBase::SetAddress(const std::string &address) {
 const std::string &SocketBase::GetPort() const {
     return s_port;
 }
-void SocketBase::SetPort(const std::string &port) {
+void SocketBase::SetSocketPort(const std::string &port) {
     SocketBase::s_port = port;
 }
 

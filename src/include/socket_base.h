@@ -30,7 +30,7 @@ public:
     [[nodiscard]] const std::string &GetAddress() const;
     void SetAddress(const std::string &address);
     [[nodiscard]] const std::string &GetPort() const;
-    void SetPort(const std::string &port);
+    void SetSocketPort(const std::string &port);        // 这里不能定义为 SetPort，因为似乎有地方定义了 SetPort
 
 
     /**
