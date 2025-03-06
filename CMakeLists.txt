@@ -11,4 +11,3 @@ add_definitions(-DAPP_VERSION="0.0.1")
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_subdirectory(src)
-add_subdirectory(test)

@@ -10,7 +10,7 @@
 #include "include/socket_client.h"
 
 ValidateArg::ValidateArg() {
-    long_opts = new struct option[]{
+    long_opts = new struct option[10]{
             {"help", no_argument, nullptr, 'h'},
             {"version", no_argument, nullptr, 'v'},
             {"server", no_argument, nullptr, 's'},
